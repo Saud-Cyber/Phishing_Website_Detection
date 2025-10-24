@@ -1,22 +1,31 @@
-from flask import Flask, request, jsonify
+import streamlit as st
 import pickle
+import numpy as np
 
-app = Flask(__name__)
-
+# Load your trained model
 with open('trained_model_compatible.pkl', 'rb') as file:
     model = pickle.load(file)
 
-@app.route('/')
-def home():
-    return "Phishing Website Detection Model API"
+# Page title
+st.title("Phishing Website Detection Web App")
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    data = request.json
-    input_features = data['input']
-    prediction = model.predict([input_features])
-    return jsonify({'prediction': prediction.tolist()})
+st.write("Enter the features below to check if a website is phishing or legitimate.")
 
-# Only run development server locally
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=5000)
+# Example: Suppose your model expects 6 features.
+# Adjust the labels and input types as needed based on your model's requirements.
+feature_names = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6']
+
+input_features = []
+for name in feature_names:
+    val = st.number_input(f"Enter {name}:", value=0.0)
+    input_features.append(val)
+
+if st.button("Predict"):
+    # Reshape for model: 2D array required by scikit-learn models
+    input_array = np.array(input_features).reshape(1, -1)
+    prediction = model.predict(input_array)[0]
+    
+    if prediction == 1:
+        st.success("Phishing website detected!")
+    else:
+        st.info("Legitimate website detected.")
