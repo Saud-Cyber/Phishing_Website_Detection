@@ -17,7 +17,6 @@ def predict():
     prediction = model.predict([input_features])
     return jsonify({'prediction': prediction.tolist()})
 
+# Only run development server locally
 if __name__ == '__main__':
-    app.run(debug=False)
-
-
+    app.run(debug=False, host='0.0.0.0', port=5000)
