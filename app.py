@@ -2,30 +2,36 @@ import streamlit as st
 import pickle
 import numpy as np
 
-# Load your trained model
+# Load trained model
 with open('trained_model_compatible.pkl', 'rb') as file:
     model = pickle.load(file)
 
-# Page title
-st.title("Phishing Website Detection Web App")
+st.title("Phishing Website Detection")
 
-st.write("Enter the features below to check if a website is phishing or legitimate.")
+st.write("Enter a URL below to check if it is a phishing website or legitimate.")
 
-# Example: Suppose your model expects 6 features.
-# Adjust the labels and input types as needed based on your model's requirements.
-feature_names = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6']
-
-input_features = []
-for name in feature_names:
-    val = st.number_input(f"Enter {name}:", value=0.0)
-    input_features.append(val)
+# Input URL from user
+input_url = st.text_input("Enter URL:", "")
 
 if st.button("Predict"):
-    # Reshape for model: 2D array required by scikit-learn models
-    input_array = np.array(input_features).reshape(1, -1)
-    prediction = model.predict(input_array)[0]
-    
-    if prediction == 1:
-        st.success("Phishing website detected!")
+    if not input_url:
+        st.warning("Please enter a URL to proceed.")
     else:
-        st.info("Legitimate website detected.")
+        # Depending on your model, you may need to extract or encode features from input_url
+        # For example, here we assume the model accepts a feature vector extracted elsewhere
+        # Replace the following line with your actual feature extraction from the URL
+        # Example placeholder: input_features = extract_features_from_url(input_url)
+
+        # For demonstration, let's pretend the URL is converted into a dummy numeric feature vector:
+        # WARNING: Replace this with your actual feature extraction logic
+        input_features = np.array([len(input_url), sum(ord(c) for c in input_url) % 100]).reshape(1, -1)
+
+        try:
+            prediction = model.predict(input_features)[0]
+
+            if prediction == 1:
+                st.error("Warning: This URL is predicted as a PHISHING website.")
+            else:
+                st.success("This URL is predicted as a LEGITIMATE website.")
+        except Exception as e:
+            st.error(f"Prediction failed: {e}")
